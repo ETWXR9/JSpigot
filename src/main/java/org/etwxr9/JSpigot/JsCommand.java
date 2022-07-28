@@ -20,7 +20,7 @@ public abstract class JsCommand extends Command implements PluginIdentifiableCom
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] arguments) {
         this.sender = sender;
-        run(sender, commandLabel, arguments);//actually run the command.
+        run(sender, commandLabel, arguments);
         return true;
     }
 
@@ -29,15 +29,6 @@ public abstract class JsCommand extends Command implements PluginIdentifiableCom
         return plugin;
     }
 
-    public abstract void run(CommandSender sender, String commandLabel, String[] arguments);//Just simpler and allows 'return;' instead of 'return true/false;'
-
-    protected void sendMessage(String... messages) {
-        Arrays.stream(messages)
-                .forEach(message -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message)));//Why not have a way to send messages easily colored?
-    }
-    protected void sendMessage(CommandSender sender, String... messages) {
-        Arrays.stream(messages)
-                .forEach(message -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message)));//Why not have a way to send messages easily colored?
-    }
+    public abstract void run(CommandSender sender, String commandLabel, String[] arguments);
 
 }
