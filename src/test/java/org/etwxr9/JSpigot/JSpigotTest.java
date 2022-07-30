@@ -2,10 +2,13 @@ package org.etwxr9.JSpigot;
 
 
 import com.google.common.io.Resources;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
 import org.junit.jupiter.api.Test;
 
 import javax.script.*;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -20,19 +23,15 @@ class JSpigotTest {
 
     @org.junit.jupiter.api.Test
     void onEnable() throws ScriptException {
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
-        var path = System.getProperty("user.dir") + "\\testjs\\";
+        Context jsContext = Context.newBuilder("js")
+                .allowAllAccess(true)
+                .build();
         try {
-            engine.eval(new java.io.FileReader(path + "test.js"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        // create an Invocable object by casting the script engine object
-        Invocable inv = (Invocable) engine;
-        // invoke the function named "hello" with "Scripting!" as the argument
-        try {
-            inv.invokeFunction("init", "helloW!");
-        } catch (NoSuchMethodException e) {
+            var initjs = Resources.getResource("js/init.js");
+            System.out.println(initjs.toString());
+            var file = new File("E:\\Work\\SpigotDev\\PluginDev\\JSpigot\\src\\main\\resources\\js\\init.js");
+            jsContext.eval(Source.newBuilder("js", file).build());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

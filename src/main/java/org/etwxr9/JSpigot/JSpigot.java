@@ -1,14 +1,20 @@
 package org.etwxr9.JSpigot;
 
 import com.google.common.io.Resources;
+import com.oracle.truffle.js.scriptengine.GraalJSScriptEngine;
+import org.bukkit.Bukkit;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.Source;
 
 import javax.script.ScriptEngine;
 
 import javax.script.ScriptEngineManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
@@ -32,28 +38,36 @@ public class JSpigot extends JavaPlugin {
     public void onEnable() {
         instance = this;
         setupSimpleCommandMap();
-        System.setProperty("nashorn.args", "--language=es6");
         ClassLoader cl = this.getClass().getClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
+        var path = getDataFolder().getPath();
+        Context jsContext = Context.newBuilder("js")
+                .allowAllAccess(true)
+                .option("engine.WarnInterpreterOnly", "false")
+                .build();
         try {
-            writeJsFile();
+            var file = new File(path + "/init.js");
+            jsContext.eval(Source.newBuilder("js", file).build());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        var sem = new ScriptEngineManager();
-        ScriptEngine engine = new ScriptEngineManager(this.getClassLoader()).getEngineByName("js");
 
-        var path = System.getProperty("user.dir");
-        try {
-            engine.eval(new java.io.FileReader(path + "\\plugins\\JSpigot\\init.js"));
-            getLogger().info("init.js loaded");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        System.setProperty("nashorn.args", "--language=es6");
 
-
+//        var sem = new ScriptEngineManager();
+//        ScriptEngine engine = new ScriptEngineManager(this.getClassLoader()).getEngineByName("js");
+//
+//        var path = getDataFolder().getPath();
+//        try {
+////            getLogger().info("DataFolder = "+path);
+//            engine.eval(new java.io.FileReader(path + "/init.js"));
+//            getLogger().info("init.js loaded");
+////            getLogger().info(Files.readString(Paths.get(path + "\\init.js")));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        registerCommands(new testCmd("jspigot"));
     }
-
     @Override
     public void onDisable() {
 

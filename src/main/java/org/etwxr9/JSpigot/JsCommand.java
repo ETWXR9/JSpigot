@@ -30,5 +30,5 @@ public abstract class JsCommand extends Command implements PluginIdentifiableCom
     }
 
     public abstract void run(CommandSender sender, String commandLabel, String[] arguments);
-
+    public abstract List<String> tabComplete(CommandSender sender, String commandLabel, String[] args);
 }
