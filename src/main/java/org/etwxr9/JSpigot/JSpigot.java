@@ -1,5 +1,6 @@
 package org.etwxr9.JSpigot;
 
+import com.google.common.io.Resources;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -8,7 +9,12 @@ import javax.script.ScriptEngine;
 
 import javax.script.ScriptEngineManager;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 
@@ -29,6 +35,11 @@ public class JSpigot extends JavaPlugin {
         System.setProperty("nashorn.args", "--language=es6");
         ClassLoader cl = this.getClass().getClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
+        try {
+            writeJsFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         var sem = new ScriptEngineManager();
         ScriptEngine engine = new ScriptEngineManager(this.getClassLoader()).getEngineByName("js");
 
@@ -71,5 +82,31 @@ public class JSpigot extends JavaPlugin {
 
     public static SimpleCommandMap getCommandMap() {
         return scm;
+    }
+
+    public void writeJsFile() throws IOException {
+        Path jspath = Paths.get(System.getProperty("user.dir") + "\\plugins\\JSpigot");
+        if (!Files.exists(jspath)) {
+            Files.createDirectories(jspath);
+        }
+        Path initpath = Paths.get(System.getProperty("user.dir") + "\\plugins\\JSpigot\\init.js");
+        if (!Files.exists(initpath)) {
+            var initfile = getResource("js/init.js");
+            Files.write(initpath,initfile.readAllBytes());
+        }
+
+        //
+        Path listenerpath = Paths.get(System.getProperty("user.dir") + "\\plugins\\JSpigot\\listener.js");
+        if (!Files.exists(listenerpath)) {
+            var listenerfile = getResource("js/listener.js");
+
+            Files.write(listenerpath, listenerfile.readAllBytes());
+        }
+        //
+        Path commandpath = Paths.get(System.getProperty("user.dir") + "\\plugins\\JSpigot\\command.js");
+        if (!Files.exists(commandpath)) {
+            var commandfile = getResource("js/command.js");
+            Files.write(commandpath, commandfile.readAllBytes());
+        }
     }
 }
